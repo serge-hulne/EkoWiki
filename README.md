@@ -1,6 +1,6 @@
 # EkoWiki.
 
-### Low footprint (RAM, disk space, Wiki)
+### Low footprint (RAM, disk space, CPU)
 
 ### Uses:
 - Go.
