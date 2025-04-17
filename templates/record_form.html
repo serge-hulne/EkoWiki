@@ -1,0 +1,112 @@
+{% include "header.html" %}
+
+<!-- Toast UI Editor CSS -->
+<link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+<!-- Toast UI Editor JavaScript -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+<!-- Md editor (optional legacy tinyMDE) -->
+<script src="https://unpkg.com/tiny-markdown-editor/dist/tiny-mde.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/tiny-markdown-editor/dist/tiny-mde.min.css" />
+
+<style>
+.toastui-editor-contents table td,
+.toastui-editor-contents table th,
+.toastui-editor-defaultUI .ProseMirror td,
+.toastui-editor-defaultUI .ProseMirror th {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+</style>
+
+<form 
+    hx-post="{% if isEdit %}/update_{{ type | lower }}{% else %}/create_{{ type | lower }}{% endif %}" 
+    hx-target="#response" 
+    hx-swap="innerHTML" 
+    method="POST">
+
+    {% for field in fields %}
+        <label for="{{ field.name }}">{{ field.label }}:</label>
+
+        {% if field.name == "Category" %}
+            <input type="text" id="category_search" name="new_category"
+                value="{{ field.value }}"
+                hx-get="/search_categories"
+                hx-trigger="keyup changed delay:300ms"
+                hx-target="#category_suggestions"
+                hx-indicator=".htmx-indicator"
+                autocomplete="off"
+                placeholder="Start typing to search categories...">
+            <div class="htmx-indicator" style="display: none;"><span>Loading...</span></div>
+            <ul id="category_suggestions" class="htmx-result"></ul>
+
+        {% elif field.name == "PrivateSelect" %}
+            <select name="PrivateSelect" id="PrivateSelect">
+                <option value="0" {% if field.value == "0" %}selected{% endif %}>No</option>
+                <option value="1" {% if field.value == "1" %}selected{% endif %}>Yes</option>
+            </select>
+            <br>
+
+        {% elif field.name == "RoleRequested" %}
+            <select name="RoleRequested" id="RoleRequested">
+                <option value="">-- Select Role --</option>
+                <option value="Member" {% if field.value == "Member" %}selected{% endif %}>Member</option>
+                <option value="Contributor" {% if field.value == "Contributor" %}selected{% endif %}>Contributor</option>
+                <option value="Editor" {% if field.value == "Editor" %}selected{% endif %}>Editor</option>
+            </select><br>
+
+        {% elif field.type == "textarea" and field.name == "Content" %}
+            <input type="hidden" id="Content" name="Content" value="{{ field.value }}">
+            <div id="editorRoot"></div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const editor = new toastui.Editor({
+                        el: document.querySelector("#editorRoot"),
+                        height: '400px',
+                        initialEditType: 'wysiwyg',
+                        previewStyle: 'horizontal',
+                        toolbarItems: [
+                            ['heading', 'bold', 'italic', 'strike'],
+                            ['hr', 'quote'],
+                            ['ul', 'ol', 'task'],
+                            ['table', 'image', 'link'],
+                            ['code', 'codeblock']
+                        ],
+                        initialValue: document.getElementById("Content").value
+                    });
+                    window.toastEditor = editor;
+                });
+            </script>
+
+        {% else %}
+            <input type="{{ field.type }}" id="{{ field.name }}" name="{{ field.name }}" value="{{ field.value }}" required><br>
+        {% endif %}
+
+    {% endfor %}
+
+    {% if isEdit %}
+        <input type="hidden" name="ID" value="{{ ID }}">
+    {% endif %}
+
+    <hr>
+    <div>
+        <button type="submit">
+            {% if isEdit %}Update{% else %}Create{% endif %} {{ type }}
+        </button>
+    </div>
+</form>
+
+<script>
+    document.querySelector("form").addEventListener("submit", () => {
+        if (window.toastEditor) {
+            const md = window.toastEditor.getMarkdown();
+            document.getElementById("Content").value = md;
+        }
+    });
+</script>
+
+<div id="response"></div>
+
+{% include "footer.html" %}

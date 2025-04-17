@@ -1,0 +1,49 @@
+{% include "header.html" %}
+
+<div style="max-width: 600px; margin: 0 auto;">
+    <form method="GET" action="/articles" style="display: flex; align-items: center;">
+        <input type="text" name="search" placeholder="Search articles..." required style="flex: 1; padding: 0.4rem;">
+        <button type="submit" title="Search" aria-label="Search" style="padding: 0.4rem 0.6rem; font-size: 1rem; border-radius: 4px; cursor: pointer;">
+            🔍
+        </button>
+    </form>
+</div>
+
+<h1>Articles</h1>
+
+{% if search_query %}
+    <p>🔍 Search results for "<strong>{{ search_query }}</strong>":</p>
+{% endif %}
+
+
+<!-- Show latest 5 articles -->
+{% if not search_query and latest_articles %}
+    <h2>Latest Articles</h2>
+    <ul>
+        {% for article in latest_articles %}
+            <li>
+                <a href="/article/{{ article.ID }}">{{ article.Title }}</a> - {{ article.Summary }}
+                <br>
+                <small>Published on {{ article.CreatedAt }}</small>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<hr> <!-- Add separator between latest and categorized articles -->
+
+<!-- Show categorized articles -->
+{% for category, articles in grouped_articles %}
+    <h2>{{ category }}</h2>
+    <ul>
+        {% for article in articles %}
+            <li>
+                <a href="/article/{{ article.ID }}">{{ article.Title }}</a> - {{ article.Summary }}
+                <br>
+                <small>Published on {{ article.CreatedAt }}</small>
+            </li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+
+{% include "footer.html" %}

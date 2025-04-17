@@ -1,0 +1,46 @@
+{% include "header.html" %}
+
+
+<div style="display: flex; align-items: center; gap: 0.5rem;">
+    <h1 style="margin: 0;">{{ article.Title }}</h1>
+
+    <!-- Edit button styled like Delete -->
+
+    {% if currentUser and (currentUser.Role == "Admin" or currentUser.Role == "Editor" or currentUser.Role == "EditorInChief" or currentUser.Role == "Contributor") %}
+        <form action="/edit_article/{{ article.ID }}" method="GET" style="margin: 0;">
+            <button type="submit" title="Edit" aria-label="Edit Article" style="padding: 4px 8px; border-radius: 4px; background: black; cursor: pointer;">
+                ✏️
+            </button>
+        </form>
+
+        <form action="/delete_article/{{ article.ID }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this article?');" style="margin: 0;">
+            <button type="submit" title="Delete" aria-label="Delete Article" style="padding: 4px 8px; border-radius: 4px; background: black; cursor: pointer;">
+                🗑️
+            </button>
+        </form>
+    {% endif %}
+
+</div>
+
+
+
+<p><strong>Category:</strong> {{ article.Category }}</p>
+<p>{{ article.Summary }}</p>
+
+<!-- 🧪 Raw markdown block -->
+<div id="markdown">{{ article.Content|safe }}</div>
+
+<em>Last updated: {{ article.UpdatedAt }}</em> 
+
+<hr>
+
+
+
+<!-- JS Markdown rendering -->
+<script type="module">
+    import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+    const content = document.getElementById("markdown").textContent; // ✅ Not innerText
+    document.getElementById("markdown").innerHTML = marked.parse(content);
+</script>
+
+{% include "footer.html" %}

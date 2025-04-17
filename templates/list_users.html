@@ -1,0 +1,46 @@
+{% include "header.html" %}
+
+<h1>👥 User Management</h1>
+
+<table style="width: 100%; border-collapse: collapse;">
+  <thead>
+    <tr style="border-bottom: 2px solid #ccc;">
+      <th align="left">Name</th>
+      <th align="left">Email</th>
+      <th align="left">Requested Role</th>
+      <th align="left">Current Role</th>
+      <th align="left">Change Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+      <tr style="border-bottom: 1px solid #eee;">
+        <td>{{ user.FirstName }} {{ user.LastName }}</td>
+        <td>{{ user.Mail }}</td>
+        <td>
+          {% if user.RoleRequested and user.RoleRequested != user.Role %}
+            <strong style="color: orange;">{{ user.RoleRequested }}</strong>
+          {% else %}
+            -
+          {% endif %}
+        </td>
+        <td><code>{{ user.Role }}</code></td>
+        <td>
+          {% if currentUser and currentUser.Role == "Admin" %}
+            <form method="POST" action="/promote_user/{{ user.ID }}" style="display: inline-block;">
+              {% for role in roles %}
+                <label>
+                    <input type="radio" name="new_role" value="{{ role }}" {% if user.Role == role %}checked{% endif %}>
+                    {{ role }}
+                </label>
+              {% endfor %}
+              <button type="submit" style="margin-top: 0.2rem; padding: 0.2rem 0.6rem;">Apply</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "footer.html" %}
