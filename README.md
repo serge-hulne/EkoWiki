@@ -4,5 +4,5 @@
 - Go.
 - Gin.
 - Sqlite3.
-- HTMX
+- HTMX.
   
