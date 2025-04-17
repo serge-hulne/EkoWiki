@@ -1,4 +1,4 @@
-# EoWiki.
+# EkoWiki.
 
 ### Uses:
 - Go.
