@@ -8,3 +8,4 @@
 - Sqlite3.
 - HTMX.
   
+Licence: GPL
